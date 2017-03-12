@@ -14,12 +14,12 @@
         android:layout_weight="8" />
 
     <android.support.design.widget.FloatingActionButton
-        android:id="@+id/floatingActionButton"
+        android:id="@+id/refreshBtn"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|right"
-        android:layout_marginBottom="@dimen/activity_vertical_margin"
-        android:layout_marginRight="@dimen/activity_horizontal_margin"
+        android:layout_marginBottom="24dp"
+        android:layout_marginRight="24dp"
         android:clickable="true"
         app:fabSize="auto"
         app:srcCompat="@drawable/ic_refresh_white_48dp" />

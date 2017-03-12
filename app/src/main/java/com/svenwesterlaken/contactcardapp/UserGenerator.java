@@ -1,5 +1,7 @@
 package com.svenwesterlaken.contactcardapp;
 
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.util.Log;
 
@@ -11,9 +13,11 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
+import java.util.ArrayList;
 
 /**
  * Created by Sven on 10-3-2017.
@@ -29,15 +33,16 @@ public class UserGenerator extends AsyncTask<String, Void, String> {
 
     @Override
     protected String doInBackground(String... params) {
-
-        InputStream inputStream = null;
         BufferedReader reader = null;
-        String urlString = "";
         String response = "";
 
         try {
             URL url = new URL(params[0]);
             URLConnection connection = url.openConnection();
+
+            if (!(connection instanceof HttpURLConnection)) {
+                return null;
+            }
 
             reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
             response = reader.readLine().toString();
@@ -71,19 +76,29 @@ public class UserGenerator extends AsyncTask<String, Void, String> {
     protected void onPostExecute(String response) {
         Log.i("Info", response);
 
+        if(response == null || response == "") {
+            Log.e("UserAPI", "onPostExecute kreeg een lege response!");
+            return;
+        }
+
         try {
             JSONObject jsonObject = new JSONObject(response);
             JSONArray users = jsonObject.getJSONArray("results");
 
             for(int i=0; i < users.length(); i++) {
                 RandomUserItem item = new RandomUserItem();
-                String name = users.getJSONObject(i).getJSONObject("name").getString("first");
+
+                String firstname = users.getJSONObject(i).getJSONObject("name").getString("first");
+                String lastname = users.getJSONObject(i).getJSONObject("name").getString("last");
+
+                String name = firstname.substring(0, 1).toUpperCase() + firstname.substring(1) + " " + lastname.substring(0, 1).toUpperCase() + lastname.substring(1);
+                String imageURL = users.getJSONObject(i).getJSONObject("picture").getString("large");
+                String user = users.getJSONObject(i).toString();
 
                 item.setName(name);
+                item.setImage(imageURL);
+                item.setJson(user);
                 listener.onRandomUserAvailable(item);
-
-
-
             }
 
         } catch (JSONException e) {
